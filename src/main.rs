@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
+use std::default::Default;
 
 fn parse_temp(s: &str) -> i32 {
     if s.ends_with("*") {
@@ -35,6 +36,38 @@ fn part1() {
     println!("{}", minimal_spread_day);
 }
 
+fn process_row_football(s: String) -> Vec<String> {
+    s.split_whitespace().map(|s| s.to_string()).collect::<Vec<String>>()
+}
+
+fn is_team_row(row: &Vec<String>) -> bool {
+    row.len() == 10
+}
+
+fn parse_score(s: &str) -> i32 {
+    s.parse::<i32>().unwrap()
+}
+
+fn part2() {
+    let f = File::open("football.dat").unwrap();
+    let f = BufReader::new(f);
+    let mut minimal_difference_team: String = Default::default();
+    let mut minimal_difference = std::i32::MAX;
+
+    for line in f.lines().map(|l| process_row_football(l.unwrap())).filter(is_team_row) {
+        let for_goals = parse_score(&line[6]);
+        let against_goals = parse_score(&line[8]);
+        let difference = (for_goals - against_goals).abs();
+        if difference < minimal_difference {
+            minimal_difference = difference;
+            minimal_difference_team = line[1].clone();
+        }
+    }
+
+    println!("{}", minimal_difference_team);
+}
+
 fn main() {
     part1();
+    part2();
 }
